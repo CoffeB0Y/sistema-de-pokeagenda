@@ -1,0 +1,10 @@
+"use client";
+import Link from 'next/link';
+import {useEffect} from 'react';
+import {useRouter,usePathname} from 'next/navigation';
+import {Brand} from './Header';
+import {useResource} from '../lib/use-resource';
+import type {UserProfile} from '../lib/api';
+import {restoreSession} from '../login/auth_service';
+const links=[['/dashboard','▦','Dashboard'],['/pokedex','▤','Pokédex'],['/meus-pokemon','◒','Meus Pokémon'],['/equipes','♧','Minhas Equipes'],['/insignias','♙','Insígnias'],['/progressao','⌁','Progressão'],['/ranking','♜','Ranking'],['/perfil','♧','Meu Perfil']];
+export default function TrainerShell({children}:{children:React.ReactNode}){const router=useRouter(),path=usePathname();const{data,error,loading,reload}=useResource<UserProfile>('/profiles/me');useEffect(()=>{let active=true;void restoreSession().then(ok=>{if(active&&!ok)router.replace('/login');});return()=>{active=false;};},[router]);useEffect(()=>{const callback=()=>reload();window.addEventListener('profile-change',callback);return()=>window.removeEventListener('profile-change',callback);},[reload]);if(loading&&!data)return <p role="status" className="pk-notice">Carregando sua jornada…</p>;if(error||!data)return <div className="pk-notice" role="alert">{error}<button className="pk-button secondary" onClick={reload}>Tentar novamente</button><Link href="/login">Entrar</Link></div>;return <div className="pk-trainer"><aside className="pk-sidebar"><Brand/><small>MENU PRINCIPAL</small><nav aria-label="Menu do treinador">{links.map(([href,icon,label])=><Link href={href} key={href} className={path===href?'active':''} aria-current={path===href?'page':undefined}><span aria-hidden>{icon}</span>{label}</Link>)}</nav><div className="pk-sidebar-user"><strong>{data.name}</strong><Link href="/logout">Sair da conta →</Link></div></aside><div className="pk-trainer-main"><header className="pk-topbar"><Link href="/pokedex">⌕ Pesquisar na Pokédex</Link><Link href="/perfil">{data.name} ▾</Link></header><main className="pk-trainer-content">{children}</main></div></div>;}

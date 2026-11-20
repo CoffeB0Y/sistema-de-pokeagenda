@@ -1,0 +1,2 @@
+import type {Progress} from '../lib/api';
+export default function TrainerMetrics({progress,rank}:{progress:Progress;rank?:number}){return <div className="pk-metrics">{[['◒','Pokémon capturados',progress.pokemonCaptured],['♙','Insígnias conquistadas',`${progress.badges} / 8`],['♧','Equipes criadas',progress.teams],['♜','Posição no ranking',rank?`#${rank}`:'—']].map(([icon,label,value])=><div className="pk-panel" key={label}><span aria-hidden>{icon}</span><div><small>{label}</small><strong>{value}</strong></div></div>)}</div>;}
